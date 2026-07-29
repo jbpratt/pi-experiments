@@ -8,6 +8,8 @@ README for what it does and how to install it.
 
 ## Extensions
 
+- [`extensions/lazyworktree`](extensions/lazyworktree) — coming soon
+- [`kube-approval`](kube-approval) — approval gate for guarded oc/kubectl/aws bash commands
 - [`extensions/lazyworktree`](extensions/lazyworktree) — protects the LazyWorktree main checkout from unreviewed mutation and gives the agent a `workspace` tool to prepare, create, rebase, and merge managed Git worktrees.
 
 ## Development
