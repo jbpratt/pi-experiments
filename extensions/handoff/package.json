@@ -1,0 +1,22 @@
+{
+	"name": "pi-handoff",
+	"version": "0.1.0",
+	"description": "Pi extension that generates a reviewed session-handoff prompt and starts a fresh continuation session, with an optional request/response interop contract for a task-tracking extension to own the destination.",
+	"keywords": [
+		"pi-package",
+		"pi-extension",
+		"handoff",
+		"session",
+		"continuation"
+	],
+	"type": "module",
+	"peerDependencies": {
+		"@earendil-works/pi-ai": "*",
+		"@earendil-works/pi-coding-agent": "*"
+	},
+	"pi": {
+		"extensions": [
+			"./index.ts"
+		]
+	}
+}
