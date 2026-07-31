@@ -44,6 +44,49 @@ test("renderCompact/renderExpanded on search result mention count and displayPat
 	assert.ok(expanded.length > 0);
 });
 
+test("renderExpanded omits symbolId from bulk candidate lists (upstream-style: name/path/line is enough there)", () => {
+	const result = makeSearchResult();
+	const expanded = renderExpanded(result);
+	assert.equal(expanded.includes("fn:abc123"), false, "a bulk candidate list should not spend tokens on opaque ids");
+	assert.equal(expanded.includes("fn:def456"), false);
+});
+
+test("renderExpanded surfaces symbolId on a resolved single symbol so a model can chain into codegraph_trace", () => {
+	const result: CodeGraphSymbolResult = {
+		schemaVersion: RESULT_SCHEMA_VERSION,
+		codegraphVersion: "1.5.0",
+		status: "ready",
+		repositoryId: "repo-1",
+		displayPath: "~/code/repo",
+		head: "deadbeef",
+		branch: "main",
+		symbol: makeSymbol(),
+		related: [makeSymbol({ symbolId: "fn:def456", name: "otherThing" })],
+		edges: [],
+	};
+	const expanded = renderExpanded(result);
+	assert.ok(expanded.includes("fn:abc123"), "the resolved focal symbol's id must be chainable into codegraph_trace");
+	assert.equal(expanded.includes("fn:def456"), false, "a bulk related-symbol list should not spend tokens on opaque ids either");
+});
+
+test("renderExpanded surfaces symbolId on trace node listings so a model can continue tracing from any of them", () => {
+	const result: CodeGraphTraceResult = {
+		schemaVersion: RESULT_SCHEMA_VERSION,
+		codegraphVersion: "1.5.0",
+		status: "ready",
+		repositoryId: "repo-1",
+		displayPath: "~/code/repo",
+		head: "deadbeef",
+		branch: "main",
+		mode: "call_graph",
+		nodes: [makeSymbol(), makeSymbol({ symbolId: "fn:def456", name: "otherThing" })],
+		edges: [],
+	};
+	const expanded = renderExpanded(result);
+	assert.ok(expanded.includes("fn:abc123"));
+	assert.ok(expanded.includes("fn:def456"));
+});
+
 test("renderExpanded on ambiguous symbol result indicates ambiguity and lists candidates", () => {
 	const result: CodeGraphSymbolResult = {
 		schemaVersion: RESULT_SCHEMA_VERSION,

@@ -34,10 +34,21 @@ function formatBytes(bytes: number): string {
 	return `${(bytes / 1024 / 1024).toFixed(1)} MB`;
 }
 
-function formatSymbolLine(symbol: CodeGraphSymbol): string {
+// `includeId` is opt-in, not default: printing the opaque symbolId on every
+// row of a bulk candidate/related list burns real tokens on a hash the
+// model almost never reuses (upstream's own Claude-facing formatter omits
+// node ids from prose entirely — see @colbymchenry/codegraph's
+// context/formatter.js, which references symbols as "name (kind) - path:line"
+// and only emits `id` in its separate JSON-for-programmatic-use variant).
+// codegraph_trace has no name-based fallback, though, so the id must appear
+// somewhere the model can carry forward: on the one resolved focal symbol
+// from codegraph_symbol, and on trace node listings themselves — exactly the
+// two places a model would actually chain a follow-up call from.
+function formatSymbolLine(symbol: CodeGraphSymbol, options: { includeId?: boolean } = {}): string {
 	const location = `${symbol.span.path}:${symbol.span.startLine}-${symbol.span.endLine}`;
 	const signature = symbol.signature ? ` — ${symbol.signature}` : "";
-	return `${symbol.name} [${symbol.kind}/${symbol.language} (${symbol.coverage})] ${location}${signature}`;
+	const id = options.includeId ? ` {symbolId: ${symbol.symbolId}}` : "";
+	return `${symbol.name} [${symbol.kind}/${symbol.language} (${symbol.coverage})] ${location}${signature}${id}`;
 }
 
 function formatList<T>(items: T[], formatter: (item: T) => string, cap: number = MAX_LIST_ENTRIES): string[] {
@@ -142,7 +153,7 @@ export function renderExpanded(result: CodeGraphAnyResult): string {
 		involvedSymbols.push(...result.nodes);
 		if (result.nodes.length > 0) {
 			lines.push("Nodes:");
-			for (const line of formatList(result.nodes, (node) => `  ${formatSymbolLine(node)}`)) lines.push(line);
+			for (const line of formatList(result.nodes, (node) => `  ${formatSymbolLine(node, { includeId: true })}`)) lines.push(line);
 		}
 		if (result.edges.length > 0) {
 			lines.push("Edges:");
@@ -151,7 +162,7 @@ export function renderExpanded(result: CodeGraphAnyResult): string {
 	} else if (hasSymbol(result) && result.symbol) {
 		const symbol = result.symbol;
 		involvedSymbols.push(symbol);
-		lines.push(`Symbol: ${formatSymbolLine(symbol)}`);
+		lines.push(`Symbol: ${formatSymbolLine(symbol, { includeId: true })}`);
 		if (result.relation) lines.push(`Relation: ${result.relation}`);
 
 		const related = result.related ?? [];
