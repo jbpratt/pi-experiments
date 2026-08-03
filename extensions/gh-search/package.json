@@ -1,0 +1,23 @@
+{
+	"name": "pi-gh-search",
+	"version": "0.1.0",
+	"description": "Pi extension for bounded, parsed GitHub code/repo/issue/PR/commit search and single-file reads via the gh CLI (gh_search, gh_read_file).",
+	"keywords": [
+		"pi-package",
+		"pi-extension",
+		"github",
+		"gh",
+		"search"
+	],
+	"type": "module",
+	"peerDependencies": {
+		"@earendil-works/pi-ai": "*",
+		"@earendil-works/pi-coding-agent": "*",
+		"typebox": "*"
+	},
+	"pi": {
+		"extensions": [
+			"./index.ts"
+		]
+	}
+}

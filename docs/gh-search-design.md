@@ -1,7 +1,8 @@
 # Design: `pi-gh-search` extension
 
-Status: design only, not yet implemented. No code under `extensions/gh-search/`
-exists yet; this doc is the spec to build against.
+Status: implemented. See `extensions/gh-search/` for the implementation and its
+own README; this doc remains the design rationale and the exact `--json`
+field tables referenced from there.
 
 ## Motivation
 
