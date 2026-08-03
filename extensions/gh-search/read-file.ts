@@ -143,6 +143,11 @@ export function formatDirectoryListing(params: GhReadFileParams, entries: GhDire
 		const size = entry.type === "file" && typeof entry.size === "number" ? ` (${entry.size} bytes)` : "";
 		lines.push(`[${kind}] ${entry.name}${size}`);
 	}
+	// offset/limit are a file line-window contract; a directory has no lines to window,
+	// so an explicitly-set value is dropped here. Say so rather than silently ignoring it.
+	if (params.offset !== undefined || params.limit !== undefined) {
+		lines.push("", "Note: offset/limit were ignored — path is a directory, not a file.");
+	}
 	return lines.join("\n");
 }
 

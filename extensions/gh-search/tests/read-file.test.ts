@@ -131,6 +131,16 @@ test("formatDirectoryListing renders entries with type and size", () => {
 	assert.match(text, /\[file\] main\.go \(123 bytes\)/);
 });
 
+test("formatDirectoryListing notes when offset/limit were set but ignored (directory has no lines to window)", () => {
+	const entries = [{ name: "gh", path: "cmd/gh", type: "dir" }];
+	const withOffset = formatDirectoryListing({ repo: "cli/cli", path: "cmd", offset: 5 } as GhReadFileParams, entries);
+	assert.match(withOffset, /Note: offset\/limit were ignored — path is a directory, not a file\./);
+	const withLimit = formatDirectoryListing({ repo: "cli/cli", path: "cmd", limit: 10 } as GhReadFileParams, entries);
+	assert.match(withLimit, /Note: offset\/limit were ignored/);
+	const withNeither = formatDirectoryListing({ repo: "cli/cli", path: "cmd" } as GhReadFileParams, entries);
+	assert.doesNotMatch(withNeither, /ignored/);
+});
+
 test("sliceLines is 1-indexed and defaults to the start of the file", () => {
 	const result = sliceLines("a\nb\nc\nd\ne");
 	assert.equal(result.startLine, 1);
