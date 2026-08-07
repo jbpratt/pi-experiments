@@ -1,0 +1,3 @@
+[submodule "extensions/agent-base"]
+	path = extensions/agent-base
+	url = https://github.com/Marcusk19/agent-base
