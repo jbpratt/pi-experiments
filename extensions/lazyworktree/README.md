@@ -1,6 +1,6 @@
 # pi-lazyworktree
 
-A [pi](https://pi.dev) extension that treats [LazyWorktree](https://www.npmjs.com/package/lazyworktree)-managed Git worktrees as pi's unit of workspace isolation: it protects the main checkout from unreviewed mutation, and gives the agent a `workspace` tool to prepare, create, rebase, and merge worktrees safely.
+A [pi](https://pi.dev) extension that treats [LazyWorktree](https://github.com/chmouel/lazyworktree)-managed Git worktrees as pi's unit of workspace isolation: it protects the main checkout from unreviewed mutation, and gives the agent a `workspace` tool to prepare, create, rebase, and merge worktrees safely.
 
 This extension has no dependency on any other pi extension or package beyond pi itself. It shells out to the separate `lazyworktree` CLI and to `git`.
 
@@ -49,7 +49,32 @@ or from a local checkout:
 pi install ./extensions/lazyworktree
 ```
 
-Requires the [`lazyworktree`](https://www.npmjs.com/package/lazyworktree) CLI on `PATH`, and `tmux` for automatic new-window Pi launches (optional — `create` falls back to printing a manual launch command otherwise).
+Requires the Go-based [`lazyworktree`](https://github.com/chmouel/lazyworktree) CLI **v1.46.0 or newer** on `PATH`, and `tmux` for automatic new-window Pi launches (optional — `create` falls back to printing a manual launch command otherwise).
+
+Do **not** install `npm:lazyworktree`; that package is a different project and does not provide the JSON machine API (`worktrees ... --json`, `notes get --json`, etc.) required by this extension.
+
+Install the compatible CLI with Go:
+
+```bash
+go install github.com/chmouel/lazyworktree/cmd/lazyworktree@v1.49.0
+```
+
+Verify Pi will find a compatible binary:
+
+```bash
+which -a lazyworktree
+lazyworktree worktrees list --help | grep -- --json
+lazyworktree worktrees resolve --help | grep -- --cwd
+lazyworktree notes get --help | grep -- --json
+```
+
+If `lazyworktree worktrees list --json --no-agent` fails with `unknown option '--json'`, remove the incompatible npm package and reinstall the Go CLI:
+
+```bash
+npm uninstall -g lazyworktree
+go install github.com/chmouel/lazyworktree/cmd/lazyworktree@v1.49.0
+hash -r
+```
 
 ## Notes on scope
 
